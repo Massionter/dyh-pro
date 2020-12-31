@@ -30,9 +30,9 @@ const serverList = (options) => {
   return builder({
     pageSize: pageSize,
     pageNo: pageNo,
-    totalCount: totalCount,
+    total: totalCount,
     totalPage: totalPage,
-    data: result
+    list: result
   })
 }
 

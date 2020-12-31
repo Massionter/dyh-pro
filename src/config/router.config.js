@@ -24,13 +24,13 @@ export const asyncRouterMap = [
         children: [
           {
             path: '/mrmib/index',
-            name: 'Analysis',
+            name: 'mrmib',
             component: () => import('@/views/mrmib/index'),
             meta: { title: '首页', keepAlive: false, permission: ['dashboard'] }
           },
           {
             path: '/mrmib/weixin',
-            name: 'Workplace',
+            name: 'weixin',
             component: () => import('@/views/mrmib/weixin'),
             meta: { title: '微信记录表', keepAlive: true, permission: ['dashboard'] }
           }

@@ -17,7 +17,7 @@ export default {
   props: Object.assign({}, T.props, {
     rowKey: {
       type: [String, Function],
-      default: 'key'
+      default: 'id'
     },
     data: {
       type: Function,
@@ -74,10 +74,15 @@ export default {
     pageURI: {
       type: Boolean,
       default: false
+    },
+    tableData: {
+      type: Array,
+      default: () => []
     }
   }),
   watch: {
     'localPagination.current' (val) {
+      console.log(val)
       this.pageURI && this.$router.push({
         ...this.$route,
         name: this.$route.name,
@@ -152,20 +157,22 @@ export default {
         ...filters
       }
       )
+      console.log(parameter)
       const result = this.data(parameter)
-      // 对接自己的通用数据接口需要修改下方代码中的 r.pageNo, r.totalCount, r.data
+      // 对接自己的通用数据接口需要修改下方代码中的 r.pageNo, r.totalCount, r.list
       // eslint-disable-next-line
       if ((typeof result === 'object' || typeof result === 'function') && typeof result.then === 'function') {
         result.then(r => {
+          console.log(r)
           this.localPagination = this.showPagination && Object.assign({}, this.localPagination, {
-            current: r.pageNo, // 返回结果中的当前分页数
-            total: r.totalCount, // 返回结果中的总记录数
+            current: r.pageNum, // 返回结果中的当前分页数
+            total: r.total, // 返回结果中的总记录数
             showSizeChanger: this.showSizeChanger,
             pageSize: (pagination && pagination.pageSize) ||
               this.localPagination.pageSize
           }) || false
           // 为防止删除数据后导致页面当前页面数据长度为 0 ,自动翻页到上一页
-          if (r.data.length === 0 && this.showPagination && this.localPagination.current > 1) {
+          if (r.list.length === 0 && this.showPagination && this.localPagination.current > 1) {
             this.localPagination.current--
             this.loadData()
             return
@@ -180,7 +187,7 @@ export default {
           } catch (e) {
             this.localPagination = false
           }
-          this.localDataSource = r.data // 返回结果中的数组数据
+          this.localDataSource = r.list // 返回结果中的数组数据
           this.localLoading = false
         })
       }

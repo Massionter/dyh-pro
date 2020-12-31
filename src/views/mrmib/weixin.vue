@@ -45,6 +45,9 @@
         <div class="table-operator">
           <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
           <a-popconfirm placement="topLeft" ok-text="Yes" cancel-text="No" @confirm="confirm">
+            <template slot="title">
+              <p>确认删除吗?</p>
+            </template>
             <a-button>删除</a-button>
           </a-popconfirm>
           <a-upload :file-list="fileList" :remove="handleRemove" :before-upload="beforeUpload">
@@ -60,7 +63,7 @@
             {{ uploading ? '上传中' : '确认上传' }}
           </a-button>
         </div>
-
+        <div style="margin:10px 0">返款金额大于119的会显示红色</div>
         <s-table
           ref="table"
           size="default"
@@ -147,20 +150,20 @@ const columns = [
     dataIndex: 'middlePerson'
   },
   {
-    title: '更新日期',
-    dataIndex: 'updateTime'
-  },
-  {
     title: '返款状态',
     dataIndex: 'status'
   },
   {
-    title: '返款失败原因',
-    dataIndex: 'failReason'
-  },
-  {
     title: '备注',
     dataIndex: 'content'
+  },
+  {
+    title: '更新日期',
+    dataIndex: 'updateTime'
+  },
+  {
+    title: '返款失败原因',
+    dataIndex: 'failReason'
   },
   {
     title: '操作',
@@ -247,6 +250,15 @@ export default {
                   style: {
                     color: '#eab558',
                     backgroudColor: '#eab558'
+                  }
+                }
+              }
+            }
+             if (item.dataIndex === 'money') {
+              if (record.money > 119) {
+                return {
+                  style: {
+                    color: 'red'
                   }
                 }
               }

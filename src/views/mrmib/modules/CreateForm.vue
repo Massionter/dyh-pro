@@ -28,7 +28,7 @@
           <a-input v-decorator="['createPeople']" />
         </a-form-item>
         <a-form-item label="支付宝账号">
-          <a-input v-decorator="['createPeople']" />
+          <a-input v-decorator="['accountNumber']" />
         </a-form-item>
         <a-form-item label="姓名">
           <a-input v-decorator="['name']" />

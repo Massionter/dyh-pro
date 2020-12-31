@@ -3,7 +3,7 @@
  * @Date: 2020-12-31 10:49:58
  * @LastEditors: daiyonghong
  * @LastModifiedBy: daiyonghong
- * @LastEditTime: 2020-12-31 14:56:28
+ * @LastEditTime: 2020-12-31 19:05:00
  * @FilePath: \dyh-pro\src\views\mrmib\weixin.vue
  * @Description: 描述
 -->
@@ -41,43 +41,44 @@
 
         <div class="table-operator">
           <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
-          <a-dropdown>
-            <a-menu slot="overlay">
+          <a-popconfirm placement="topLeft" ok-text="Yes" cancel-text="No" @confirm="confirm">
+            <a-button>删除</a-button>
+          </a-popconfirm>
+          <!-- <a-dropdown>
+            <a-menu slot="overlay" @click="clickDropdown">
               <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
-              <!-- lock | unlock -->
               <a-menu-item key="2"><a-icon type="lock" />锁定</a-menu-item>
             </a-menu>
             <a-button style="margin-left: 8px">
               批量操作 <a-icon type="down" />
             </a-button>
-          </a-dropdown>
+          </a-dropdown> -->
         </div>
 
         <s-table
           ref="table"
           size="default"
-          :columns="columns"
+          :columns="renderColumns(columns)"
           :data="loadData"
           :tableData="tableData"
           :alert="true"
           :rowSelection="rowSelection"
           showPagination="auto"
+          style="color:red"
         >
           <span slot="serial" slot-scope="text, record, index">
             {{ index + 1 }}
           </span>
-          <span slot="status" slot-scope="text">
+          <!-- <span slot="status" slot-scope="text">
             <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
-          </span>
-          <span slot="description" slot-scope="text">
+          </span> -->
+          <span slot="reason" slot-scope="text">
             <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
           </span>
 
           <span slot="action" slot-scope="text, record">
             <template>
               <a @click="handleEdit(record)">修改</a>
-              <!-- <a-divider type="vertical" />
-              <a @click="handleSub(record)">订阅报警</a> -->
             </template>
           </span>
         </s-table>
@@ -90,7 +91,6 @@
           @cancel="handleCancel"
           @ok="handleOk"
         />
-        <!-- <step-by-step-modal ref="modal" @ok="handleOk"/> -->
       </a-card>
     </page-header-wrapper>
   </div>
@@ -101,8 +101,6 @@ import { paged } from '@/api/mrmib'
 import moment from 'moment'
 import { STable, Ellipsis } from '@/components'
 import { getRoleList } from '@/api/manage'
-
-// import StepByStepModal from './modules/StepByStepModal'
 import CreateForm from './modules/CreateForm'
 const columns = [
   {
@@ -165,24 +163,6 @@ const columns = [
     scopedSlots: { customRender: 'action' }
   }
 ]
-const statusMap = {
-  0: {
-    status: 'default',
-    text: '关闭'
-  },
-  1: {
-    status: 'processing',
-    text: '运行中'
-  },
-  2: {
-    status: 'success',
-    text: '已上线'
-  },
-  3: {
-    status: 'error',
-    text: '异常'
-  }
-}
 export default {
   data () {
     this.columns = columns
@@ -197,9 +177,7 @@ export default {
       // queryParam: {},
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        console.log(parameter)
         const requestParameters = Object.assign({}, parameter, this.searchParams)
-        console.log('loadData request parameters:', requestParameters)
         return paged(requestParameters).then(res => {
           return res.bizdata
         })
@@ -209,8 +187,6 @@ export default {
       selectedRows: [],
       api,
       searchParams: {
-        // pageNo: 1,
-        // pageSize: 10
         queryMap: {
         }
       }
@@ -222,17 +198,16 @@ export default {
     CreateForm
     // StepByStepModal
   },
-  filters: {
-    statusFilter (type) {
-      return statusMap[type].text
-    },
-    statusTypeFilter (type) {
-      return statusMap[type].status
-    }
-  },
+  // filters: {
+  //   statusFilter (type) {
+  //     return statusMap[type].text
+  //   },
+  //   statusTypeFilter (type) {
+  //     return statusMap[type].status
+  //   }
+  // },
   created () {
     getRoleList({ t: new Date() })
-    // this.paged()
   },
   computed: {
     rowSelection () {
@@ -243,12 +218,48 @@ export default {
     }
   },
   methods: {
-    paged () {
-      // this.api.paged(this.pageParams).then(res => {
-      //   console.log(res)
-      //   this.tableData = res.bizdata.list
-      // })
+    renderColumns (columns) {
+      const _this = this
+      return columns.map(item => {
+        return {
+          ...item,
+          customCell (record, rowIndex) {
+            if (item.dataIndex === 'accountNumber') {
+              if (record.repeatAccount === 1) {
+                 return {
+                    style: {
+                          // display: 'block',
+                          color: '#FF5733',
+                          backgroudColor: '#FF5733'
+                        }
+                }
+              }
+            }
+            if (item.dataIndex === 'name') {
+              if (record.repeatName === 1) {
+                return {
+                    style: {
+                          color: '#bd7def',
+                          backgroudColor: '#bd7def'
+                        }
+                }
+              }
+            }
+              if (item.dataIndex === 'nickname') {
+              if (record.repeatName === 1) {
+                return {
+                    style: {
+                          color: '#eab558',
+                          backgroudColor: '#eab558'
+                        }
+                }
+              }
+            }
+          }
+        }
+      })
     },
+
     handleAdd () {
       this.mdl = null
       this.visible = true
@@ -265,11 +276,7 @@ export default {
           console.log('values', values)
           if (values.id > 0) {
             // 修改 e.g.
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                resolve()
-              }, 1000)
-            }).then(res => {
+            this.api.updated(values).then(res => {
               this.visible = false
               this.confirmLoading = false
               // 重置表单数据
@@ -281,11 +288,7 @@ export default {
             })
           } else {
             // 新增
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                resolve()
-              }, 1000)
-            }).then(res => {
+            this.api.created(values).then(res => {
               this.visible = false
               this.confirmLoading = false
               // 重置表单数据
@@ -303,29 +306,39 @@ export default {
     },
     handleCancel () {
       this.visible = false
-
       const form = this.$refs.createModal.form
       form.resetFields() // 清理表单数据（可不做）
-    },
-    handleSub (record) {
-      if (record.status !== 0) {
-        this.$message.info(`${record.no} 订阅成功`)
-      } else {
-        this.$message.error(`${record.no} 订阅失败，规则已关闭`)
-      }
     },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
     },
-    toggleAdvanced () {
-      this.advanced = !this.advanced
-    },
     resetSearchForm () {
       this.searchParams.queryMap = {
         date: moment(new Date())
+      }
+    },
+    confirm (val) {
+      const deleteIds = this.selectedRows.map(val => val.id.toString())
+      this.api.deleteByIds(deleteIds).then(res => {
+        this.$message.info(res.bizdata)
+        this.$refs.table.refresh()
+      })
+    },
+    rowClassName (row) {
+      console.log(row)
+      if (row.repeatAccount === 1) {
+        console.log('重复', row.accountNumber)
+        return 'row-class'
+      } else {
+        return ''
       }
     }
   }
 }
 </script>
+<style lang="less">
+.row-class {
+  background-color: #915850;
+}
+</style>

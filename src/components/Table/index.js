@@ -157,13 +157,11 @@ export default {
         ...filters
       }
       )
-      console.log(parameter)
       const result = this.data(parameter)
       // 对接自己的通用数据接口需要修改下方代码中的 r.pageNo, r.totalCount, r.list
       // eslint-disable-next-line
       if ((typeof result === 'object' || typeof result === 'function') && typeof result.then === 'function') {
         result.then(r => {
-          console.log(r)
           this.localPagination = this.showPagination && Object.assign({}, this.localPagination, {
             current: r.pageNum, // 返回结果中的当前分页数
             total: r.total, // 返回结果中的总记录数

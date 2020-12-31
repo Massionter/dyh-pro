@@ -3,7 +3,7 @@
  * @Date: 2020-12-31 10:45:16
  * @LastEditors: daiyonghong
  * @LastModifiedBy: daiyonghong
- * @LastEditTime: 2020-12-31 14:49:29
+ * @LastEditTime: 2020-12-31 19:08:33
  * @FilePath: \dyh-pro\src\api\mrmib.js
  * @Description: 描述
  */
@@ -35,7 +35,15 @@ export function updated (data) {
 
 export function deleteByIds (data) {
   return request({
-    url: '/api/account/deleteByIds',
+    url: '/account/deleteByIds',
+    method: 'post',
+    data
+  })
+}
+
+export function importExcel (data) {
+  return request({
+    url: '/account/excelPut',
     method: 'post',
     data
   })

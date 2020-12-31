@@ -16,23 +16,26 @@
             <a-row :gutter="48">
               <a-col :md="6" :sm="24">
                 <a-form-item label="旺旺ID">
-                  <a-input v-model="searchParams.queryMap.nickname" placeholder=""/>
+                  <a-input v-model="searchParams.queryMap.nickname" placeholder="" />
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="24">
                 <a-form-item label="姓名">
-                  <a-input v-model="searchParams.queryMap.name" placeholder=""/>
+                  <a-input v-model="searchParams.queryMap.name" placeholder="" />
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="24">
                 <a-form-item label="支付宝账号">
-                  <a-input v-model="searchParams.queryMap.accountNumber" placeholder=""/>
+                  <a-input v-model="searchParams.queryMap.accountNumber" placeholder="" />
                 </a-form-item>
               </a-col>
               <a-col :md="6" :sm="24">
-                <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
+                <span
+                  class="table-page-search-submitButtons"
+                  :style="(advanced && { float: 'right', overflow: 'hidden' }) || {}"
+                >
                   <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-                  <a-button style="margin-left: 8px" @click="() => this.searchParams.queryMap = {}">重置</a-button>
+                  <a-button style="margin-left: 8px" @click="() => (this.searchParams.queryMap = {})">重置</a-button>
                 </span>
               </a-col>
             </a-row>
@@ -44,15 +47,18 @@
           <a-popconfirm placement="topLeft" ok-text="Yes" cancel-text="No" @confirm="confirm">
             <a-button>删除</a-button>
           </a-popconfirm>
-          <!-- <a-dropdown>
-            <a-menu slot="overlay" @click="clickDropdown">
-              <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
-              <a-menu-item key="2"><a-icon type="lock" />锁定</a-menu-item>
-            </a-menu>
-            <a-button style="margin-left: 8px">
-              批量操作 <a-icon type="down" />
-            </a-button>
-          </a-dropdown> -->
+          <a-upload :file-list="fileList" :remove="handleRemove" :before-upload="beforeUpload">
+            <a-button> <a-icon type="upload" />选择文件</a-button>
+          </a-upload>
+          <a-button
+            type="primary"
+            :disabled="fileList.length === 0"
+            :loading="uploading"
+            style="margin-top: 16px"
+            @click="handleUpload"
+          >
+            {{ uploading ? '上传中' : '确认上传' }}
+          </a-button>
         </div>
 
         <s-table
@@ -164,7 +170,7 @@ const columns = [
   }
 ]
 export default {
-  data () {
+  data() {
     this.columns = columns
     return {
       // create model
@@ -173,8 +179,6 @@ export default {
       mdl: null,
       // 高级搜索 展开/关闭
       advanced: false,
-      // 查询参数
-      // queryParam: {},
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         const requestParameters = Object.assign({}, parameter, this.searchParams)
@@ -187,30 +191,22 @@ export default {
       selectedRows: [],
       api,
       searchParams: {
-        queryMap: {
-        }
-      }
+        queryMap: {}
+      },
+      fileList: [],
+      uploading: false
     }
   },
   components: {
     STable,
     Ellipsis,
     CreateForm
-    // StepByStepModal
   },
-  // filters: {
-  //   statusFilter (type) {
-  //     return statusMap[type].text
-  //   },
-  //   statusTypeFilter (type) {
-  //     return statusMap[type].status
-  //   }
-  // },
-  created () {
+  created() {
     getRoleList({ t: new Date() })
   },
   computed: {
-    rowSelection () {
+    rowSelection() {
       return {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange
@@ -218,40 +214,40 @@ export default {
     }
   },
   methods: {
-    renderColumns (columns) {
+    renderColumns(columns) {
       const _this = this
       return columns.map(item => {
         return {
           ...item,
-          customCell (record, rowIndex) {
+          customCell(record, rowIndex) {
             if (item.dataIndex === 'accountNumber') {
               if (record.repeatAccount === 1) {
-                 return {
-                    style: {
-                          // display: 'block',
-                          color: '#FF5733',
-                          backgroudColor: '#FF5733'
-                        }
+                return {
+                  style: {
+                    // display: 'block',
+                    color: '#FF5733',
+                    backgroudColor: '#FF5733'
+                  }
                 }
               }
             }
             if (item.dataIndex === 'name') {
               if (record.repeatName === 1) {
                 return {
-                    style: {
-                          color: '#bd7def',
-                          backgroudColor: '#bd7def'
-                        }
+                  style: {
+                    color: '#bd7def',
+                    backgroudColor: '#bd7def'
+                  }
                 }
               }
             }
-              if (item.dataIndex === 'nickname') {
+            if (item.dataIndex === 'nickname') {
               if (record.repeatName === 1) {
                 return {
-                    style: {
-                          color: '#eab558',
-                          backgroudColor: '#eab558'
-                        }
+                  style: {
+                    color: '#eab558',
+                    backgroudColor: '#eab558'
+                  }
                 }
               }
             }
@@ -260,20 +256,19 @@ export default {
       })
     },
 
-    handleAdd () {
+    handleAdd() {
       this.mdl = null
       this.visible = true
     },
-    handleEdit (record) {
+    handleEdit(record) {
       this.visible = true
       this.mdl = { ...record }
     },
-    handleOk () {
+    handleOk() {
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
         if (!errors) {
-          console.log('values', values)
           if (values.id > 0) {
             // 修改 e.g.
             this.api.updated(values).then(res => {
@@ -304,35 +299,56 @@ export default {
         }
       })
     },
-    handleCancel () {
+    handleCancel() {
       this.visible = false
       const form = this.$refs.createModal.form
       form.resetFields() // 清理表单数据（可不做）
     },
-    onSelectChange (selectedRowKeys, selectedRows) {
+    onSelectChange(selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
     },
-    resetSearchForm () {
+    resetSearchForm() {
       this.searchParams.queryMap = {
         date: moment(new Date())
       }
     },
-    confirm (val) {
+    confirm(val) {
       const deleteIds = this.selectedRows.map(val => val.id.toString())
       this.api.deleteByIds(deleteIds).then(res => {
         this.$message.info(res.bizdata)
         this.$refs.table.refresh()
       })
     },
-    rowClassName (row) {
-      console.log(row)
-      if (row.repeatAccount === 1) {
-        console.log('重复', row.accountNumber)
-        return 'row-class'
-      } else {
-        return ''
-      }
+
+    handleRemove(file) {
+      const index = this.fileList.indexOf(file)
+      const newFileList = this.fileList.slice()
+      newFileList.splice(index, 1)
+      this.fileList = newFileList
+    },
+    beforeUpload(file) {
+      this.fileList = [...this.fileList, file]
+      return false
+    },
+    handleUpload() {
+      const { fileList } = this
+      const formData = new FormData()
+      // fileList.forEach(file => {
+      //   formData.append('files[]', file);
+      // });
+      this.uploading = true
+      this.api
+        .importExcel(fileList[0])
+        .then(res => {
+          this.fileList = []
+          this.uploading = false
+          this.$message.success('上传成功')
+        })
+        .catch(() => {
+          this.uploading = false
+          this.$message.error('上传失败')
+        })
     }
   }
 }

@@ -41,10 +41,12 @@ export function deleteByIds (data) {
   })
 }
 
-export function importExcel (data) {
+export function importExcel (file) {
+  const formData = new FormData()
+  formData.append('excelFile', file)
   return request({
     url: '/account/excelPut',
     method: 'post',
-    data
+    data: formData
   })
 }

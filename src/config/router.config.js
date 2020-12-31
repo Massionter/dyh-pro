@@ -15,6 +15,27 @@ export const asyncRouterMap = [
     meta: { title: 'menu.home' },
     redirect: '/dashboard/workplace',
     children: [
+      {
+        path: '/mrmib',
+        name: 'mrmib',
+        redirect: '/mrmib/weixin',
+        component: RouteView,
+        meta: { title: 'MRMIB登记', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] },
+        children: [
+          {
+            path: '/mrmib/index',
+            name: 'Analysis',
+            component: () => import('@/views/mrmib/index'),
+            meta: { title: '首页', keepAlive: false, permission: ['dashboard'] }
+          },
+          {
+            path: '/mrmib/weixin',
+            name: 'Workplace',
+            component: () => import('@/views/mrmib/weixin'),
+            meta: { title: '微信记录表', keepAlive: true, permission: ['dashboard'] }
+          }
+        ]
+      },
       // dashboard
       {
         path: '/dashboard',

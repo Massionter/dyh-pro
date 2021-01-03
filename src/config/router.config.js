@@ -16,6 +16,21 @@ export const asyncRouterMap = [
     redirect: '/dashboard/workplace',
     children: [
       {
+        path: '/lzc',
+        name: 'lzc',
+        redirect: '/lzc/weixin',
+        component: RouteView,
+        meta: { title: 'lzc', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] },
+        children: [
+          {
+            path: '/lzc/index',
+            name: 'lzc_index',
+            component: () => import('@/views/lzc'),
+            meta: { title: '登记记录', keepAlive: true, permission: ['dashboard'] }
+          }
+        ]
+      },
+      {
         path: '/mrmib',
         name: 'mrmib',
         redirect: '/mrmib/weixin',

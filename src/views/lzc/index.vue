@@ -3,8 +3,8 @@
  * @Date: 2020-12-31 10:49:58
  * @LastEditors: daiyonghong
  * @LastModifiedBy: daiyonghong
- * @LastEditTime: 2020-12-31 19:05:00
- * @FilePath: \dyh-pro\src\views\mrmib\weixin.vue
+ * @LastEditTime: 2021-01-05 10:08:17
+ * @FilePath: \dyh-pro\src\views\lzc\index.vue
  * @Description: 描述
 -->
 <template>
@@ -132,7 +132,7 @@ const columns = [
   }
 ]
 export default {
-  data() {
+  data () {
     this.columns = columns
     return {
       // create model
@@ -164,11 +164,11 @@ export default {
     Ellipsis,
     CreateForm
   },
-  created() {
+  created () {
     getRoleList({ t: new Date() })
   },
   computed: {
-    rowSelection() {
+    rowSelection () {
       return {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange
@@ -176,12 +176,12 @@ export default {
     }
   },
   methods: {
-    renderColumns(columns) {
+    renderColumns (columns) {
       const _this = this
       return columns.map(item => {
         return {
           ...item,
-          customCell(record, rowIndex) {
+          customCell (record, rowIndex) {
             if (item.dataIndex === 'accountNumber') {
               if (record.repeatAccount === 1) {
                 return {
@@ -227,15 +227,15 @@ export default {
       })
     },
 
-    handleAdd() {
+    handleAdd () {
       this.mdl = null
       this.visible = true
     },
-    handleEdit(record) {
+    handleEdit (record) {
       this.visible = true
       this.mdl = { ...record }
     },
-    handleOk() {
+    handleOk () {
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
@@ -243,14 +243,18 @@ export default {
           if (values.id > 0) {
             // 修改 e.g.
             this.api.updated(values).then(res => {
-              this.visible = false
+              if (res.retcode === '000000') {
+                 this.visible = false
               this.confirmLoading = false
               // 重置表单数据
               form.resetFields()
               // 刷新表格
               this.$refs.table.refresh()
-
               this.$message.info('修改成功')
+              } else {
+                this.$message.error(res.errors)
+                this.confirmLoading = false
+              }
             })
           } else {
             // 新增
@@ -274,21 +278,21 @@ export default {
         }
       })
     },
-    handleCancel() {
+    handleCancel () {
       this.visible = false
       const form = this.$refs.createModal.form
       form.resetFields() // 清理表单数据（可不做）
     },
-    onSelectChange(selectedRowKeys, selectedRows) {
+    onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
     },
-    resetSearchForm() {
+    resetSearchForm () {
       this.searchParams.queryMap = {
         date: moment(new Date())
       }
     },
-    confirm(val) {
+    confirm (val) {
       const deleteIds = this.selectedRows.map(val => val.id.toString())
       this.api.deleteByIds(deleteIds).then(res => {
         this.$message.info(res.bizdata)
@@ -296,17 +300,17 @@ export default {
       })
     },
 
-    handleRemove(file) {
+    handleRemove (file) {
       const index = this.fileList.indexOf(file)
       const newFileList = this.fileList.slice()
       newFileList.splice(index, 1)
       this.fileList = newFileList
     },
-    beforeUpload(file) {
+    beforeUpload (file) {
       this.fileList = [...this.fileList, file]
       return false
     },
-    handleUpload() {
+    handleUpload () {
       const { fileList } = this
       const formData = new FormData()
       // fileList.forEach(file => {

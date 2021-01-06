@@ -3,7 +3,7 @@
  * @Date: 2020-12-31 10:49:58
  * @LastEditors: daiyonghong
  * @LastModifiedBy: daiyonghong
- * @LastEditTime: 2020-12-31 19:05:00
+ * @LastEditTime: 2021-01-06 10:05:03
  * @FilePath: \dyh-pro\src\views\mrmib\weixin.vue
  * @Description: 描述
 -->
@@ -78,9 +78,11 @@
           <span slot="serial" slot-scope="text, record, index">
             {{ index + 1 }}
           </span>
-          <!-- <span slot="status" slot-scope="text">
-            <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
-          </span> -->
+          <span slot="status" slot-scope="text">
+            <a-tag :color="parseInt(text) === 0 ? '#f50' : (parseInt(text) === 1 ? '#87d068' : '#2db7f5')">
+              {{ formatStatus(text) }}
+            </a-tag>
+          </span>
           <span slot="reason" slot-scope="text">
             <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
           </span>
@@ -151,7 +153,8 @@ const columns = [
   },
   {
     title: '返款状态',
-    dataIndex: 'status'
+    dataIndex: 'status',
+    scopedSlots: { customRender: 'status' }
   },
   {
     title: '备注',
@@ -173,7 +176,7 @@ const columns = [
   }
 ]
 export default {
-  data() {
+  data () {
     this.columns = columns
     return {
       // create model
@@ -205,11 +208,11 @@ export default {
     Ellipsis,
     CreateForm
   },
-  created() {
+  created () {
     getRoleList({ t: new Date() })
   },
   computed: {
-    rowSelection() {
+    rowSelection () {
       return {
         selectedRowKeys: this.selectedRowKeys,
         onChange: this.onSelectChange
@@ -217,12 +220,32 @@ export default {
     }
   },
   methods: {
-    renderColumns(columns) {
+    formatStatus (status) {
+      let cell = ''
+      switch (parseInt(status)) {
+        case 0:
+          cell = '账号不存在'
+          break
+        case 1:
+          cell = '正常'
+          break
+        case 2:
+          cell = '手动打款'
+          break
+        case 3:
+          cell = '名字不符合'
+          break
+        default:
+          break
+      }
+      return cell
+    },
+    renderColumns (columns) {
       const _this = this
       return columns.map(item => {
         return {
           ...item,
-          customCell(record, rowIndex) {
+          customCell (record, rowIndex) {
             if (item.dataIndex === 'accountNumber') {
               if (record.repeatAccount === 1) {
                 return {
@@ -268,15 +291,15 @@ export default {
       })
     },
 
-    handleAdd() {
+    handleAdd () {
       this.mdl = null
       this.visible = true
     },
-    handleEdit(record) {
+    handleEdit (record) {
       this.visible = true
       this.mdl = { ...record }
     },
-    handleOk() {
+    handleOk () {
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
@@ -311,21 +334,21 @@ export default {
         }
       })
     },
-    handleCancel() {
+    handleCancel () {
       this.visible = false
       const form = this.$refs.createModal.form
       form.resetFields() // 清理表单数据（可不做）
     },
-    onSelectChange(selectedRowKeys, selectedRows) {
+    onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
     },
-    resetSearchForm() {
+    resetSearchForm () {
       this.searchParams.queryMap = {
         date: moment(new Date())
       }
     },
-    confirm(val) {
+    confirm (val) {
       const deleteIds = this.selectedRows.map(val => val.id.toString())
       this.api.deleteByIds(deleteIds).then(res => {
         this.$message.info(res.bizdata)
@@ -333,19 +356,19 @@ export default {
       })
     },
 
-    handleRemove(file) {
+    handleRemove (file) {
       const index = this.fileList.indexOf(file)
       const newFileList = this.fileList.slice()
       newFileList.splice(index, 1)
       this.fileList = newFileList
     },
-    beforeUpload(file) {
+    beforeUpload (file) {
       this.fileList = [...this.fileList, file]
       return false
     },
-    handleUpload() {
+    handleUpload () {
       const { fileList } = this
-      const formData = new FormData()
+      // const formData = new FormData()
       // fileList.forEach(file => {
       //   formData.append('files[]', file);
       // });

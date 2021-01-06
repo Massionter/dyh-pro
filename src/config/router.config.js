@@ -47,7 +47,22 @@ export const asyncRouterMap = [
             path: '/mrmib/weixin',
             name: 'weixin',
             component: () => import('@/views/mrmib/weixin'),
-            meta: { title: '微信记录表', keepAlive: true, permission: ['dashboard'] }
+            meta: { title: '返款登记表', keepAlive: true, permission: ['dashboard'] }
+          }
+        ]
+      },
+      {
+        path: '/viewui',
+        name: 'viewui',
+        redirect: '/viewui/index',
+        component: RouteView,
+        meta: { title: 'View UI 练习', keepAlive: true, icon: bxAnaalyse, permission: ['dashboard'] },
+        children: [
+          {
+            path: '/viewui/tree',
+            name: 'viewui',
+            component: () => import('@/views/viewui/tree'),
+            meta: { title: '右键树节点', keepAlive: false, permission: ['dashboard'] }
           }
         ]
       },

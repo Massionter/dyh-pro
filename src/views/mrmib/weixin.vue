@@ -3,7 +3,7 @@
  * @Date: 2020-12-31 10:49:58
  * @LastEditors: daiyonghong
  * @LastModifiedBy: daiyonghong
- * @LastEditTime: 2021-01-06 10:05:03
+ * @LastEditTime: 2021-01-06 13:42:30
  * @FilePath: \dyh-pro\src\views\mrmib\weixin.vue
  * @Description: 描述
 -->
@@ -251,8 +251,8 @@ export default {
                 return {
                   style: {
                     // display: 'block',
-                    color: '#FF5733',
-                    backgroudColor: '#FF5733'
+                    color: '#fff',
+                    'background-color': '#FF5733'
                   }
                 }
               }
@@ -261,18 +261,18 @@ export default {
               if (record.repeatName === 1) {
                 return {
                   style: {
-                    color: '#bd7def',
-                    backgroudColor: '#bd7def'
+                    color: '#fff',
+                    'background-color': '#bd7def'
                   }
                 }
               }
             }
             if (item.dataIndex === 'nickname') {
-              if (record.repeatName === 1) {
+              if (record.repeatNickname === 1) {
                 return {
                   style: {
-                    color: '#eab558',
-                    backgroudColor: '#eab558'
+                    color: '#fff',
+                    'background-color': '#eab558'
                   }
                 }
               }

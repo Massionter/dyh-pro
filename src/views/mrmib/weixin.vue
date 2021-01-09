@@ -79,7 +79,7 @@
             {{ index + 1 }}
           </span>
           <span slot="status" slot-scope="text">
-            <a-tag :color="parseInt(text) === 0 ? '#f50' : (parseInt(text) === 1 ? '#87d068' : '#2db7f5')">
+            <a-tag :color="parseInt(text) === 0 || parseInt(text) === 3 ? '#f50' : (parseInt(text) === 1 ? '#87d068' : '#2db7f5')">
               {{ formatStatus(text) }}
             </a-tag>
           </span>
@@ -236,6 +236,7 @@ export default {
           cell = '名字不符合'
           break
         default:
+          cell = status
           break
       }
       return cell

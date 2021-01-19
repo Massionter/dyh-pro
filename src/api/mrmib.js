@@ -3,7 +3,7 @@
  * @Date: 2020-12-31 10:45:16
  * @LastEditors: daiyonghong
  * @LastModifiedBy: daiyonghong
- * @LastEditTime: 2020-12-31 19:08:33
+ * @LastEditTime: 2021-01-19 16:48:00
  * @FilePath: \dyh-pro\src\api\mrmib.js
  * @Description: 描述
  */
@@ -48,5 +48,16 @@ export function importExcel (file) {
     url: '/account/excelPut',
     method: 'post',
     data: formData
+  })
+}
+
+export function getFile (path) {
+  const formData = new FormData()
+  formData.append('path', path)
+  return request({
+    url: '/account/getFileOutputStream',
+    method: 'post',
+    data: formData,
+    responseType: 'blob'
   })
 }

@@ -3,7 +3,7 @@
  * @Date: 2020-12-31 10:49:58
  * @LastEditors: daiyonghong
  * @LastModifiedBy: daiyonghong
- * @LastEditTime: 2021-01-06 13:42:30
+ * @LastEditTime: 2021-01-19 17:05:29
  * @FilePath: \dyh-pro\src\views\mrmib\weixin.vue
  * @Description: 描述
 -->
@@ -90,6 +90,9 @@
           <span slot="action" slot-scope="text, record">
             <template>
               <a @click="handleEdit(record)">修改</a>
+            </template>
+            <template>
+              <a @click="handleDownload">查看明细</a>
             </template>
           </span>
         </s-table>
@@ -385,6 +388,17 @@ export default {
           this.uploading = false
           this.$message.error('上传失败')
         })
+    },
+    handleDownload () {
+      const file = 'D:/技术部培训计划表（医博）.pdf'
+      this.api.getFile(file).then(res => {
+        var url = window.URL.createObjectURL(res)
+        var a = document.createElement('a')
+        a.href = url
+        a.download = file.split('/')[file.split('/').length - 1]
+        a.click()
+        window.URL.revokeObjectURL(url)
+      })
     }
   }
 }
